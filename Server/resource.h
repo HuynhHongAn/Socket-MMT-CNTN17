@@ -6,6 +6,7 @@
 #define IDP_SOCKETS_INIT_FAILED         103
 #define IDR_MAINFRAME                   128
 #define IDC_AllClientDialog             1000
+#define IDC_OnlineList                  1015
 
 // Next default values for new objects
 // 

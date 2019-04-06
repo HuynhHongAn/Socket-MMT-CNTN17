@@ -47,8 +47,8 @@ BOOL CClient2Dlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
-	
-	
+
+
 	//Connect to server
 
 
@@ -101,13 +101,6 @@ void CClient2Dlg::OnBnClickedButtonlogin()
 
 	// 
 
-	if (false) {
-		MainDlg maind;
-		maind.DoModal();
-	}
-	else
-	{
-		MessageBox(_T("Login failed"), _T("ERROR"), 0);
-	}
-	// TODO: Add your control notification handler code here
+	MainDlg maind;
+	maind.DoModal();
 }
