@@ -1,6 +1,8 @@
 #pragma once
 
 
+#define PORT 25000
+#define WM_SOCKET WM_USER+2
 // MainSpace dialog
 
 class MainSpace : public CDialogEx
@@ -20,6 +22,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
+
 public:
 	afx_msg void OnBnClickedButtonAttach();
 	afx_msg void OnBnClickedButtonInvite();
@@ -29,7 +32,7 @@ public:
 	CString UserPartner;
 	CString contentGroupChat;
 	CString contentPrivateChat;
-	CString OnlineList;
 	afx_msg void OnBnClickedButtonGroupsend();
 	afx_msg void OnBnClickedButtonPrivatesend();
+	afx_msg void OnBnClickedButtonLogout();
 };

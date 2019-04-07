@@ -4,6 +4,8 @@
 
 #pragma once
 #include <string>
+#include <vector>
+using namespace std;
 
 #define PORT 25000
 #define WM_SOCKET WM_USER+1
@@ -33,9 +35,9 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 private:
-	CStatic log;
-	CStatic listOnline;
-	CString m_msgString;
+	//CStatic log;
+	//CStatic listOnline;
+	//	CString m_msgString;
 	SOCKET sockServer, sockClient, flag, sclient;
 	struct sockaddr_in serverAdd;
 	int msgType;
@@ -54,21 +56,22 @@ private:
 	CString Command;
 	int R;
  // Private methods
-	std::string converFromCString(CString);
+	std::string convertFromCString(CString);
 	CString convertFromString(std::string);
+	vector<CString> findAccount(CString username);
+	void addAccount(CString account);
 public:
 	LRESULT SockMsg(WPARAM wParam, LPARAM lParam);
 	char* ConvertToChar(const CString &s);
 	void Split(CString src, CString des[2]);
 	void mSend(SOCKET sk, CString message);
 	int mRecv(SOCKET sk, CString &message);
-	void mSendToAll(CString Command);
-
-
-
+	void CServerDlg::mSendToAllExcept(SOCKET sk, CString Command);
 
 	afx_msg void OnBnClickedButtonStart();
 	afx_msg void OnBnClickedButtonStop();
 
+
+	CString m_msgString;
 
 };

@@ -3,7 +3,8 @@
 //
 
 #pragma once
-
+#define PORT 25000
+#define WM_SOCKET WM_USER+2
 
 // CClientDlg dialog
 class CClientDlg : public CDialogEx
@@ -30,7 +31,26 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+protected:
+
+	char* ConvertToChar(const CString &s);
+	void Split(CString src, CString des[2]);
+	void mSend(CString Command);
+	int mRecv(CString &Command);
+	LRESULT SockMsg(WPARAM wParam, LPARAM lParam);
+
+	SOCKET sClient;
+	CString Command;
+
+	sockaddr_in servAdd;
+	int	buffLength;
+	CString strResult[2];
+	CString userOnline;
+	int level;
+	int isLogon;
 public:
 	afx_msg void OnBnClickedButtonlogin();
 	afx_msg void OnBnClickedButtonsignup();
+	CString userName;
+	CString passWord;
 };

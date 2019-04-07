@@ -13,8 +13,10 @@
 #define Static_UserName                 1002
 #define IDC_ContentPrivateChat          1002
 #define Static_PassWord                 1003
+#define IDC_LIST1                       1003
 #define IDC_BUTTONSignUp                1004
 #define IDC_BUTTONLOGIN                 1005
+#define IDC_BUTTON_Logout               1007
 #define IDC_EDIT1                       1009
 #define IDC_EDIT2                       1010
 #define IDC_BUTTON_GroupSEND            1011
@@ -28,9 +30,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        134
+#define _APS_NEXT_RESOURCE_VALUE        138
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1003
+#define _APS_NEXT_CONTROL_VALUE         1010
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

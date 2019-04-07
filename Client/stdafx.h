@@ -36,6 +36,8 @@
 
 #include <afxsock.h>            // MFC socket extensions
 #include <afxcontrolbars.h>
+#include <afxcontrolbars.h>
+#include <afxcontrolbars.h>
 
 
 
