@@ -25,11 +25,15 @@ CServerDlg::CServerDlg(CWnd* pParent /*=nullptr*/)
 void CServerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_log, log);
+	DDX_Control(pDX, IDC_OnlineList, listOnline);
 }
 
 BEGIN_MESSAGE_MAP(CServerDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON_Start, &CServerDlg::OnBnClickedButtonStart)
+	ON_BN_CLICKED(IDC_BUTTON_Stop, &CServerDlg::OnBnClickedButtonStop)
 END_MESSAGE_MAP()
 
 
@@ -45,6 +49,7 @@ BOOL CServerDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
+
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -85,3 +90,285 @@ HCURSOR CServerDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+std::string CServerDlg::converFromCString(CString p)
+{
+	// Convert a TCHAR string to a LPCSTR
+	CT2CA pszConvertedAnsiString(p);
+	// construct a std::string using the LPCSTR input
+	std::string strStd(pszConvertedAnsiString);
+	return strStd;
+}
+
+CString CServerDlg::convertFromString(std::string p)
+{
+	return CString(p.c_str());
+	
+}
+
+LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
+{
+	if (WSAGETSELECTERROR(lParam))
+	{
+		// Display the error and close the socket
+		closesocket(wParam);
+	}
+	switch (WSAGETSELECTEVENT(lParam))
+	{
+	case FD_ACCEPT:
+	{
+		pSock[number_Socket].sockClient = accept(wParam, NULL, NULL);
+		GetDlgItem(IDC_BUTTON_Start)->EnableWindow(FALSE);
+		break;
+	}
+	case FD_READ:
+	{
+
+		int post = -1, dpos = -1;
+
+		for (int i = 0; i < number_Socket; i++)
+		{
+			if (pSock[i].sockClient == wParam)
+			{
+				if (i < number_Socket)
+					post = i;
+			}
+		}
+
+		CString temp;
+		if (mRecv(wParam, temp) < 0)
+			break;
+		Split(temp, strResult);
+		int flag = _ttoi(strResult[0]);
+		char* tem = ConvertToChar(strResult[1]);
+		switch (flag)
+		{
+		case 1://Login
+		{
+			int t = 0;
+			if (number_Socket > 0)
+			{
+				for (int i = 0; i < number_Socket; i++)
+				{
+					if (strcmp(tem, pSock[i].Name) == 0)//Trung ten user
+					{
+						t = 1;
+						break;
+					}
+				}
+			}
+
+			if (t == 0)
+			{
+				strcpy(pSock[number_Socket].Name, tem);
+				Command = _T("1\r\n1\r\n");
+				m_msgString += strResult[1] + _T(" login\r\n");
+				UpdateData(FALSE);
+				number_Socket++;
+			}
+			else
+				Command = _T("1\r\n0\r\n");
+			Command += CString(tem); // Add socket's name to send to all client
+			Command += _T("\r\n");
+			mSendToAll(Command);
+			UpdateData(FALSE);
+			break;
+		}
+
+		case 2:
+		{
+			int post = -1;
+			for (int i = 0; i < number_Socket; i++)
+			{
+				if (pSock[i].sockClient == wParam)
+				{
+					if (i < number_Socket)
+						post = i;
+				}
+			}
+			if (strResult[1] == "+")
+			{
+
+				R += 1;
+				char pszNum[32] = { 0 };
+				CString strTest(_itoa(R, pszNum, 10));
+
+				m_msgString += pSock[post].Name;
+				m_msgString += " vua gui lenh +, R = ";
+				m_msgString += strTest;
+				m_msgString += "\r\n";
+
+				Command = "2\r\n";
+				Command += strTest;
+				Command += "\r\n";
+			}
+			else
+			{
+				R -= 1;
+				char pszNum[32] = { 0 };
+				CString strTest(_itoa(R, pszNum, 10));
+
+				m_msgString += pSock[post].Name;
+				m_msgString += " vua gui lenh -, R = ";
+				m_msgString += strTest;
+				m_msgString += "\r\n";
+
+				Command = "2\r\n";
+				Command += strTest;
+				Command += "\r\n";
+			}
+
+			Command += CString(pSock[post].Name); // Bo cai ten socket vo
+			Command += _T("\r\n");
+			mSendToAll(Command);
+			UpdateData(FALSE);
+
+			break;
+		}
+
+		case 3:
+		{
+			int post = -1;
+			for (int i = 0; i < number_Socket; i++)
+			{
+				if (pSock[i].sockClient == wParam)
+				{
+					if (i < number_Socket)
+						post = i;
+				}
+			}
+
+			Command = "3\r\n1\r\n";
+
+			Command += pSock[post].Name;
+			Command += "\r\n";
+			m_msgString += pSock[post].Name;
+			m_msgString += " logout\r\n";
+			closesocket(wParam);
+			mSendToAll(Command);
+			for (int j = post; j < number_Socket; j++)
+			{
+				pSock[post].sockClient = pSock[post + 1].sockClient;
+				strcpy(pSock[post].Name, pSock[post + 1].Name);
+			}
+			number_Socket--;
+			UpdateData(FALSE);
+			break;
+		}
+		}
+		break;
+	}
+
+	case FD_CLOSE:
+	{
+		UpdateData();
+		int post = -1;
+		for (int i = 0; i < number_Socket; i++)
+		{
+			if (pSock[i].sockClient == wParam)
+			{
+				if (i < number_Socket)
+					post = i;
+			}
+		}
+
+		m_msgString += pSock[post].Name;
+		m_msgString += " logout\r\n";
+		closesocket(wParam);
+		for (int j = post; j < number_Socket; j++)
+		{
+			pSock[post].sockClient = pSock[post + 1].sockClient;
+			strcpy(pSock[post].Name, pSock[post + 1].Name);
+		}
+		number_Socket--;
+		UpdateData(FALSE);
+		break;
+	}
+
+	}
+	return 0;
+}
+
+void CServerDlg::mSendToAll(CString Command)
+{
+	for (int i = 0; i < number_Socket; i++)
+	{
+		mSend(pSock[i].sockClient, Command);
+	}
+}
+
+
+void CServerDlg::Split(CString src, CString des[2])
+{
+	int p1, p2;
+
+	p1 = src.Find(_T("\r\n"), 0);
+	des[0] = src.Mid(0, p1);
+
+	p2 = src.Find(_T("\r\n"), p1 + 1);
+	des[1] = src.Mid(p1 + 2, p2 - (p1 + 2));
+
+}
+
+char* CServerDlg::ConvertToChar(const CString &s)
+{
+	int nSize = s.GetLength();
+	char *pAnsiString = new char[nSize + 1];
+	memset(pAnsiString, 0, nSize + 1);
+	wcstombs(pAnsiString, s, nSize + 1);
+	return pAnsiString;
+}
+
+void CServerDlg::mSend(SOCKET sk, CString Command)
+{
+	int Len = Command.GetLength();
+	Len += Len;
+	PBYTE sendBuff = new BYTE[1000];
+	memset(sendBuff, 0, 1000);
+	memcpy(sendBuff, (PBYTE)(LPCTSTR)Command, Len);
+	send(sk, (char*)&Len, sizeof(Len), 0);
+	send(sk, (char*)sendBuff, Len, 0);
+	delete sendBuff;
+}
+
+int CServerDlg::mRecv(SOCKET sk, CString &Command)
+{
+	PBYTE buffer = new BYTE[1000];
+	memset(buffer, 0, 1000);
+	recv(sk, (char*)&buffLength, sizeof(int), 0);
+	recv(sk, (char*)buffer, buffLength, 0);
+	TCHAR* ttc = (TCHAR*)buffer;
+	Command = ttc;
+
+	if (Command.GetLength() == 0)
+		return -1;
+	return 0;
+}
+
+// Catch the event when click Button Start
+void CServerDlg::OnBnClickedButtonStart()
+{
+	UpdateData();
+	sockServer = socket(AF_INET, SOCK_STREAM, 0);
+	serverAdd.sin_family = AF_INET;
+	serverAdd.sin_port = htons(PORT);
+	serverAdd.sin_addr.s_addr = htonl(INADDR_ANY);
+	bind(sockServer, (SOCKADDR*)&serverAdd, sizeof(serverAdd));
+	listen(sockServer, 5);
+	int err = WSAAsyncSelect(sockServer, m_hWnd, WM_SOCKET, FD_READ | FD_ACCEPT | FD_CLOSE);
+	if (err)
+		MessageBox((LPCTSTR)"Cant call WSAAsyncSelect");
+	GetDlgItem(IDC_BUTTON_Start)->EnableWindow(FALSE);
+	number_Socket = 0;
+	pSock = new SockName[200];
+
+	srand((unsigned)time(NULL));
+	R = rand();
+}
+
+// Catch the event when click Button Stop
+void CServerDlg::OnBnClickedButtonStop()
+{
+	// TODO: Add your control notification handler code here
+	OnCancel();
+}

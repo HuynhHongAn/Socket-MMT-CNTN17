@@ -1,5 +1,5 @@
 
-// Client2.h : main header file for the PROJECT_NAME application
+// Client.h : main header file for the PROJECT_NAME application
 //
 
 #pragma once
@@ -11,14 +11,14 @@
 #include "resource.h"		// main symbols
 
 
-// CClient2App:
-// See Client2.cpp for the implementation of this class
+// CClientApp:
+// See Client.cpp for the implementation of this class
 //
 
-class CClient2App : public CWinApp
+class CClientApp : public CWinApp
 {
 public:
-	CClient2App();
+	CClientApp();
 
 // Overrides
 public:
@@ -29,4 +29,4 @@ public:
 	DECLARE_MESSAGE_MAP()
 };
 
-extern CClient2App theApp;
+extern CClientApp theApp;

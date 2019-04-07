@@ -1,26 +1,26 @@
 
-// Client2.cpp : Defines the class behaviors for the application.
+// Client.cpp : Defines the class behaviors for the application.
 //
 
 #include "stdafx.h"
-#include "Client2.h"
-#include "Client2Dlg.h"
+#include "Client.h"
+#include "ClientDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-// CClient2App
+// CClientApp
 
-BEGIN_MESSAGE_MAP(CClient2App, CWinApp)
+BEGIN_MESSAGE_MAP(CClientApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
 
-// CClient2App construction
+// CClientApp construction
 
-CClient2App::CClient2App()
+CClientApp::CClientApp()
 {
 	// support Restart Manager
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
@@ -30,14 +30,14 @@ CClient2App::CClient2App()
 }
 
 
-// The one and only CClient2App object
+// The one and only CClientApp object
 
-CClient2App theApp;
+CClientApp theApp;
 
 
-// CClient2App initialization
+// CClientApp initialization
 
-BOOL CClient2App::InitInstance()
+BOOL CClientApp::InitInstance()
 {
 	// InitCommonControlsEx() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
@@ -76,7 +76,7 @@ BOOL CClient2App::InitInstance()
 	// such as the name of your company or organization
 	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
 
-	CClient2Dlg dlg;
+	CClientDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)

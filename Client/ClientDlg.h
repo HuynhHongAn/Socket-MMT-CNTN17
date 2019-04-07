@@ -1,19 +1,20 @@
 
-// Client2Dlg.h : header file
+// ClientDlg.h : header file
 //
 
 #pragma once
 
-// CClient2Dlg dialog
-class CClient2Dlg : public CDialogEx
+
+// CClientDlg dialog
+class CClientDlg : public CDialogEx
 {
 // Construction
 public:
-	CClient2Dlg(CWnd* pParent = nullptr);	// standard constructor
+	CClientDlg(CWnd* pParent = nullptr);	// standard constructor
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_CLIENT2_DIALOG };
+	enum { IDD = IDD_CLIENT_DIALOG };
 #endif
 
 	protected:
@@ -31,4 +32,5 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedButtonlogin();
+	afx_msg void OnBnClickedButtonsignup();
 };

@@ -1,43 +1,43 @@
 
-// Client2Dlg.cpp : implementation file
+// ClientDlg.cpp : implementation file
 //
 
 #include "stdafx.h"
-#include "Client2.h"
-#include "Client2Dlg.h"
+#include "Client.h"
+#include "ClientDlg.h"
 #include "afxdialogex.h"
-#include "MainDlg.h"
-
+#include "MainSpace.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-// CClient2Dlg dialog
+// CClientDlg dialog
 
 
 
-CClient2Dlg::CClient2Dlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_CLIENT2_DIALOG, pParent)
+CClientDlg::CClientDlg(CWnd* pParent /*=nullptr*/)
+	: CDialogEx(IDD_CLIENT_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
-void CClient2Dlg::DoDataExchange(CDataExchange* pDX)
+void CClientDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 }
 
-BEGIN_MESSAGE_MAP(CClient2Dlg, CDialogEx)
+BEGIN_MESSAGE_MAP(CClientDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTONLOGIN, &CClient2Dlg::OnBnClickedButtonlogin)
+	ON_BN_CLICKED(IDC_BUTTONLOGIN, &CClientDlg::OnBnClickedButtonlogin)
+	ON_BN_CLICKED(IDC_BUTTONSignUp, &CClientDlg::OnBnClickedButtonsignup)
 END_MESSAGE_MAP()
 
 
-// CClient2Dlg message handlers
+// CClientDlg message handlers
 
-BOOL CClient2Dlg::OnInitDialog()
+BOOL CClientDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
@@ -48,10 +48,6 @@ BOOL CClient2Dlg::OnInitDialog()
 
 	// TODO: Add extra initialization here
 
-
-	//Connect to server
-
-
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -59,7 +55,7 @@ BOOL CClient2Dlg::OnInitDialog()
 //  to draw the icon.  For MFC applications using the document/view model,
 //  this is automatically done for you by the framework.
 
-void CClient2Dlg::OnPaint()
+void CClientDlg::OnPaint()
 {
 	if (IsIconic())
 	{
@@ -86,21 +82,21 @@ void CClient2Dlg::OnPaint()
 
 // The system calls this function to obtain the cursor to display while the user drags
 //  the minimized window.
-HCURSOR CClient2Dlg::OnQueryDragIcon()
+HCURSOR CClientDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
 
 
-void CClient2Dlg::OnBnClickedButtonlogin()
+//Catch the event when click  Button Login in first dialog
+void CClientDlg::OnBnClickedButtonlogin()
 {
-	// Get username , password
+	MainSpace obj;
+	obj.DoModal();
+}
 
-	// Send to server
-
-	// 
-
-	MainDlg maind;
-	maind.DoModal();
+// Catch the event when click Button SignUp in first dialog
+void CClientDlg::OnBnClickedButtonsignup()
+{
 }
