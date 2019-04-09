@@ -325,7 +325,7 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 			m_msgString += " logout\r\n";
 			closesocket(wParam);
 			CListBox * listbox = (CListBox *)GetDlgItem(IDC_LIST1);
-			listbox->DeleteString(listbox->FindString(0, CString(pSock[post].Name)));
+			listbox->DeleteString(listbox->FindString(-1, CString(pSock[post].Name)));
 
 			UpdateData();
 
@@ -413,7 +413,7 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		m_msgString += " logout\r\n";
 		closesocket(wParam);
 		CListBox * listbox = (CListBox *)GetDlgItem(IDC_LIST1);
-		listbox->DeleteString(listbox->FindString(0, CString(pSock[post].Name)));
+		listbox->DeleteString(listbox->FindString(-1, CString(pSock[post].Name)));
 
 		for (int j = post; j < number_Socket; j++)
 		{

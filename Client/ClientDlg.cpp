@@ -165,6 +165,8 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 			if (flag2 == 1)
 			{
 				MessageBox(_T("Success\r\n"));
+				MainSpace obj;
+				obj.DoModal();
 			}
 			if (flag2 == 0)
 			{
