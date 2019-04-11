@@ -6,7 +6,6 @@
 #include "Client.h"
 #include "ClientDlg.h"
 #include "afxdialogex.h"
-#include "MainSpace.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -20,8 +19,82 @@ CClientDlg::CClientDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_CLIENT_DIALOG, pParent)
 	, userName(_T(""))
 	, passWord(_T(""))
+	, contentGroupChat(_T(""))
+	, contentPrivateChat(_T(""))
+	, StringIP(_T("127.0.0.1"))
+	, onlineList(_T(""))
+	, notifi(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+}
+
+void CClientDlg::ShowAllComponent()
+{
+	GetDlgItem(IDC_ContentGroupChat2)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_EDIT1)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_BUTTON_GroupSEND)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_STATIC)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_EDIT2)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_BUTTON_Invite)->ShowWindow(SW_SHOW);
+	//GetDlgItem(IDC_BUTTON_Leave2)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_editMessage)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_ContentPrivateChat2)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_BUTTON_PrivateSEND)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_ContentGroupChat2)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_BUTTON_Attach)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_BUTTON_Logout)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_LIST2)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_STATIC_G)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_STATIC_P)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_STATICP2)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_STATICP3)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_STATICCli)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_STATICNoti)->ShowWindow(SW_SHOW);
+
+	GetDlgItem(IDC_editUserName)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_BUTTONSignUp)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_BUTTONLOGIN)->ShowWindow(SW_HIDE);
+	GetDlgItem(Static_UserName)->ShowWindow(SW_HIDE);
+	GetDlgItem(Static_PassWord)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_editPassWord)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_StringIP)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_SIP)->ShowWindow(SW_HIDE);
+}
+
+void CClientDlg::HideAllComponent()
+{
+	// Chat Area
+
+	GetDlgItem(IDC_ContentGroupChat2)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_EDIT1)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_BUTTON_GroupSEND)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_EDIT2)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_BUTTON_Invite)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_BUTTON_Leave2)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_editMessage)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_ContentPrivateChat2)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_BUTTON_PrivateSEND)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_ContentGroupChat2)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_BUTTON_Attach)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_BUTTON_Logout)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC_G)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC_P)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATICP2)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATICP3)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATICCli)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATICNoti)->ShowWindow(SW_HIDE);
+
+	// Login Area
+	GetDlgItem(IDC_editUserName)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_BUTTONSignUp)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_BUTTONLOGIN)->ShowWindow(SW_SHOW);
+	GetDlgItem(Static_UserName)->ShowWindow(SW_SHOW);
+	GetDlgItem(Static_PassWord)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_editPassWord)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_StringIP)->ShowWindow(SW_SHOW);
+	GetDlgItem(IDC_SIP)->ShowWindow(SW_SHOW);
 }
 
 void CClientDlg::DoDataExchange(CDataExchange* pDX)
@@ -29,6 +102,11 @@ void CClientDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_editUserName, userName);
 	DDX_Text(pDX, IDC_editPassWord, passWord);
+	DDX_Text(pDX, IDC_ContentGroupChat2, contentGroupChat);
+	DDX_Text(pDX, IDC_ContentPrivateChat2, contentPrivateChat);
+	DDX_Text(pDX, IDC_StringIP, StringIP);
+	DDX_Text(pDX, IDC_STATICCli, onlineList);
+	DDX_Text(pDX, IDC_STATICNoti, notifi);
 }
 
 BEGIN_MESSAGE_MAP(CClientDlg, CDialogEx)
@@ -37,6 +115,12 @@ BEGIN_MESSAGE_MAP(CClientDlg, CDialogEx)
 	ON_MESSAGE(WM_SOCKET, SockMsg)
 	ON_BN_CLICKED(IDC_BUTTONLOGIN, &CClientDlg::OnBnClickedButtonlogin)
 	ON_BN_CLICKED(IDC_BUTTONSignUp, &CClientDlg::OnBnClickedButtonsignup)
+	ON_BN_CLICKED(IDC_BUTTON_GroupSEND, &CClientDlg::OnBnClickedButtonGroupsend)
+	ON_BN_CLICKED(IDC_BUTTON_PrivateSEND, &CClientDlg::OnBnClickedButtonPrivatesend)
+	ON_BN_CLICKED(IDC_BUTTON_Attach, &CClientDlg::OnBnClickedButtonAttach)
+	ON_BN_CLICKED(IDC_BUTTON_Invite, &CClientDlg::OnBnClickedButtonInvite)
+	ON_BN_CLICKED(IDC_BUTTON_Leave2, &CClientDlg::OnBnClickedButtonLeave2)
+	ON_BN_CLICKED(IDC_BUTTON_Logout, &CClientDlg::OnBnClickedButtonLogout)
 END_MESSAGE_MAP()
 
 
@@ -52,6 +136,7 @@ BOOL CClientDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
+	HideAllComponent();
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -153,20 +238,28 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		if (mRecv(temp) < 0) {
 			break;
 		}
-		MessageBox(temp);
 		UpdateData(FALSE);
 		Split(temp, strResult);
 		int flag1 = _ttoi(strResult[0]);
+
+		if (flag1 == 0) {
+			CString t = temp;
+			notifi += strResult[1];
+			notifi += "\r\n";
+
+			int p = t.Find(strResult[1], 0) + strResult[1].GetLength() + 2;
+			onlineList = t.Mid(p);
+			UpdateData(FALSE);
+			break;
+		}
 		int flag2 = _ttoi(strResult[1]);
 		switch (flag1)
 		{
-		case 1: // log in
-		{
+		case 1: {
 			if (flag2 == 1)
 			{
 				MessageBox(_T("Success\r\n"));
-				MainSpace obj;
-				obj.DoModal();
+				ShowAllComponent();
 			}
 			if (flag2 == 0)
 			{
@@ -183,9 +276,7 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 			UpdateData(FALSE);
 			break;
 		}
-
-		case 2:
-		{
+		case 2: {
 			if (flag2 == 0)
 			{
 				MessageBox(_T("Sign Up failed\r\nUsername has been used\r\n"));
@@ -203,7 +294,60 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 
 			break;
 		}
+		case 3: { // Required logout
+			MessageBox(_T("Logout\n"));
+			closesocket(sClient);
+			HideAllComponent();
+			break;
 		}
+		case 4: {
+			contentGroupChat += strResult[1];
+			contentGroupChat += "\r\n";
+			//	GetDlgItem(IDC_ContentGroupChat2)->SetWindowTextW(strResult[1]);
+			UpdateData(FALSE);
+			break;
+		}
+		case 5: {
+
+
+			if (flag2 == 0) {
+				contentPrivateChat = "Your partner is not exist or online\r\n";
+			}
+			if (flag2 == 1) {
+				contentPrivateChat = "Your partner is on another private chat\r\n";
+			}
+			if (flag2 == 2) { // 9\r\n :
+				contentPrivateChat = "Ready for a new private chat\r\n";
+				GetDlgItem(IDC_BUTTON_Invite)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_EDIT2)->ShowWindow(SW_HIDE);
+				GetDlgItem(IDC_BUTTON_Leave2)->ShowWindow(SW_SHOW);
+
+			}
+			UpdateData(FALSE);
+			break;
+		}
+		case 6: {
+			contentPrivateChat += "The conversation with your partner ended\r\n";
+			GetDlgItem(IDC_BUTTON_Invite)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_EDIT2)->SetWindowTextW(L"");
+
+			GetDlgItem(IDC_EDIT2)->ShowWindow(SW_SHOW);
+			GetDlgItem(IDC_BUTTON_Leave2)->ShowWindow(SW_HIDE);
+
+			contentPrivateChat = "";
+			//UpdateData(FALSE);
+			break;
+		}
+		case 9: {
+			contentPrivateChat += strResult[1];
+			contentPrivateChat += "\r\n";
+			UpdateData(FALSE);
+
+			break;
+		}
+				break;
+		}
+		UpdateData(FALSE);
 		break;
 	}
 	case FD_CLOSE:
@@ -217,7 +361,6 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 	}
 	return 0;
 }
-
 
 //Catch the event when click  Button Login in first dialog
 void CClientDlg::OnBnClickedButtonlogin()
@@ -233,12 +376,12 @@ void CClientDlg::OnBnClickedButtonlogin()
 	}
 	servAdd.sin_family = AF_INET;
 	servAdd.sin_port = htons(PORT);
-	CString IP("127.0.0.1");
-	char* cIP = ConvertToChar(IP);
+	//CString IP("127.0.0.1");
+	char* cIP = ConvertToChar(StringIP);
 
 	servAdd.sin_addr.s_addr = inet_addr(cIP);
 
-	CStringA cpy_IP(IP);
+	CStringA cpy_IP(StringIP);
 
 	if (servAdd.sin_addr.s_addr == INADDR_NONE)
 	{
@@ -268,7 +411,6 @@ void CClientDlg::OnBnClickedButtonlogin()
 		return;
 	}
 
-
 	Command = "1\r\n";
 	Command += user + '/' + password;
 	Command += "\r\n";
@@ -276,11 +418,9 @@ void CClientDlg::OnBnClickedButtonlogin()
 	mSend(Command);
 
 
-
 	WSAAsyncSelect(sClient, m_hWnd, WM_SOCKET, FD_READ | FD_CLOSE);
+
 	UpdateData(FALSE);
-
-
 }
 
 // Catch the event when click Button SignUp in first dialog
@@ -297,12 +437,12 @@ void CClientDlg::OnBnClickedButtonsignup()
 	}
 	servAdd.sin_family = AF_INET;
 	servAdd.sin_port = htons(PORT);
-	CString IP("127.0.0.1");
-	char* cIP = ConvertToChar(IP);
+	//CString IP("127.0.0.1");
+	char* cIP = ConvertToChar(StringIP);
 
 	servAdd.sin_addr.s_addr = inet_addr(cIP);
 
-	CStringA cpy_IP(IP);
+	CStringA cpy_IP(StringIP);
 
 	if (servAdd.sin_addr.s_addr == INADDR_NONE)
 	{
@@ -316,7 +456,9 @@ void CClientDlg::OnBnClickedButtonsignup()
 		return;
 	}
 
+	// Phan ket noi dialog voi server
 	int err = connect(sClient, (struct sockaddr*)&servAdd, sizeof(servAdd));
+
 	if (err == SOCKET_ERROR) {
 		MessageBox(_T("Connect failed"), _T("ERROR"), 0);
 		return;
@@ -344,3 +486,78 @@ void CClientDlg::OnBnClickedButtonsignup()
 	WSAAsyncSelect(sClient, m_hWnd, WM_SOCKET, FD_READ | FD_CLOSE);
 	UpdateData(FALSE);
 }
+
+
+void CClientDlg::OnBnClickedButtonGroupsend()
+{
+	CString msgTemp;
+	GetDlgItemText(IDC_EDIT1, msgTemp);
+	Command = "4\r\n";
+	Command += msgTemp;
+	Command += "\r\n";
+	mSend(Command);
+	contentGroupChat += "You: ";
+	contentGroupChat += msgTemp;
+	contentGroupChat += "\r\n";
+	SetDlgItemText(IDC_EDIT1, L"");
+	UpdateData(FALSE);
+
+}
+
+
+void CClientDlg::OnBnClickedButtonPrivatesend()
+{
+
+	CString msgTemp;
+	GetDlgItemText(IDC_editMessage, msgTemp);
+	Command = "9\r\n";
+	Command += msgTemp;
+	Command += "\r\n";
+	mSend(Command);
+	contentPrivateChat += "You: ";
+	contentPrivateChat += msgTemp;
+	contentPrivateChat += "\r\n";
+	SetDlgItemText(IDC_editMessage, L"");
+	UpdateData(FALSE);
+}
+
+
+void CClientDlg::OnBnClickedButtonAttach()
+{
+	// TODO: Add your control notification handler code here
+}
+
+
+void CClientDlg::OnBnClickedButtonInvite()
+{
+	// TODO: Add your control notification handler code here
+	CString userPartner;
+	GetDlgItemText(IDC_EDIT2, userPartner);
+	Command = "5\r\n";
+	Command += userPartner;
+	Command += "\r\n";
+	mSend(Command);
+	UpdateData(FALSE);
+}
+
+
+void CClientDlg::OnBnClickedButtonLeave2()
+{
+	Command = "6\r\n0\r\n";
+	mSend(Command);
+}
+
+
+void CClientDlg::OnBnClickedButtonLogout()
+{
+	Command = "3\r\n1\r\n";
+	mSend(Command);
+	HideAllComponent();
+	SetDlgItemText(IDC_EDIT1, L"");
+	SetDlgItemText(IDC_editMessage, L"");
+	SetDlgItemText(IDC_EDIT2, L"");
+	contentGroupChat = "";
+	contentPrivateChat = "";
+	UpdateData(FALSE);
+}
+// "9\r\n\Msg\r\n

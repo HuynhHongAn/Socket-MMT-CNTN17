@@ -6,12 +6,16 @@
 #define PORT 25000
 #define WM_SOCKET WM_USER+2
 
+
 // CClientDlg dialog
 class CClientDlg : public CDialogEx
 {
 // Construction
 public:
 	CClientDlg(CWnd* pParent = nullptr);	// standard constructor
+	//void HideAllComponent();
+	void ShowAllComponent();
+	void HideAllComponent();
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
@@ -46,11 +50,21 @@ protected:
 	int	buffLength;
 	CString strResult[2];
 	CString userOnline;
-	int level;
-	int isLogon;
+
 public:
 	afx_msg void OnBnClickedButtonlogin();
 	afx_msg void OnBnClickedButtonsignup();
 	CString userName;
 	CString passWord;
+	afx_msg void OnBnClickedButtonGroupsend();
+	afx_msg void OnBnClickedButtonPrivatesend();
+	afx_msg void OnBnClickedButtonAttach();
+	afx_msg void OnBnClickedButtonInvite();
+	afx_msg void OnBnClickedButtonLeave2();
+	afx_msg void OnBnClickedButtonLogout();
+	CString contentGroupChat;
+	CString contentPrivateChat;
+	CString StringIP;
+	CString onlineList;
+	CString notifi;
 };

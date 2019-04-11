@@ -57,4 +57,7 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\x64\Release\Data.txt" />
+  </ItemGroup>
 </Project>

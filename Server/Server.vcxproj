@@ -204,6 +204,9 @@
   <ItemGroup>
     <Image Include="res\Server.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\x64\Release\Data.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

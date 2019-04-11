@@ -50,11 +50,10 @@ private:
 		SOCKET sockClient;
 		char Name[200];
 	};
-
+	vector<int> convAr;
 	SockName *pSock;
 	CString strResult[2];
 	CString Command;
-	int R;
  // Private methods
 	std::string convertFromCString(CString);
 	CString convertFromString(std::string);

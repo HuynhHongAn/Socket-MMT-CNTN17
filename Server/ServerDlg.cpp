@@ -23,6 +23,7 @@ CServerDlg::CServerDlg(CWnd* pParent /*=nullptr*/)
 	, m_msgString(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
 }
 
 void CServerDlg::DoDataExchange(CDataExchange* pDX)
@@ -214,19 +215,26 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 							// Update List Online
 							CListBox * listbox = (CListBox *)GetDlgItem(IDC_LIST1);
 							listbox->AddString(CtempUser);
+							convAr.push_back(-1);
+
 							//  Send to all client except the sender client
 							Command = _T("0\r\n ");
 							Command += CtempUser;
-							Command += _T("\r\n1\r\n"); // 1 mean login
-							mSendToAllExcept(wParam,Command);
-
+							Command += _T(" login\r\n"); // 1 mean login
+							for (int i = 0; i < listbox->GetCount(); i++)
+							{
+								CString te;
+								listbox->GetText(i, te);
+								Command += te; 
+								Command += "\r\n";
+							}
+							mSendToAllExcept(wParam, Command);
+							mSend(wParam, Command);
 							//Update server's log
 							m_msgString += CtempUser + _T(" login\r\n");
-
 							UpdateData(FALSE);
 
 							number_Socket++;
-
 
 						}
 						else { // Wrong password => login failed
@@ -242,7 +250,6 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 						Command = _T("1\r\n3\r\n");
 						mSend(wParam, Command);
 						UpdateData(FALSE);
-
 					}
 				}
 				else // account has been used => login failed
@@ -256,9 +263,9 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 				UpdateData(FALSE);
 				break;
 			}
-
 			else	// Sign Up required: "2\r\n_Username/Password_\r\n"
 			{		// Return : "2\r\n_number_\r\n" : 1 success, 0:2 failed
+				MessageBox(temp);
 				int t = 0;
 				if (number_Socket > 0)
 				{
@@ -302,37 +309,64 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 				break;
 			}
 		}
-		switch (flag)
+		else switch (flag)
 		{
 		case 3: // Logout Required "3\r\n1\r\n" , always send to all client
 		{
-			int post = -1;
+		
+			if (convAr[post] != -1) {
+
+				Command = "6\r\n2\r\n"; // Notification leave private
+				mSend(pSock[convAr[post]].sockClient, Command);
+
+				convAr[convAr[post]] = -1;
+				convAr[post] = -1;
+			}
+			// Todo : cap nhat vector convAr;
+			for (int i = post + 1; i < number_Socket; i++)
+			{
+				convAr[i - 1] = convAr[i];
+			}
 			for (int i = 0; i < number_Socket; i++)
 			{
-				if (pSock[i].sockClient == wParam)
+				if (convAr[i] > post)
 				{
-					if (i < number_Socket)
-						post = i;
+					convAr[i]--;
 				}
 			}
 
-			Command = _T("0\r\n ");
-			Command += pSock[post].Name;
-			Command += _T("\r\n0\r\n"); // 0 mean logout
-			mSendToAllExcept(wParam, Command);
+			///
+			Command = _T("3\r\n0\r\n");
+			mSend(wParam, Command);
+
+
 
 			m_msgString += pSock[post].Name;
 			m_msgString += " logout\r\n";
+			UpdateData(FALSE);
+
 			closesocket(wParam);
 			CListBox * listbox = (CListBox *)GetDlgItem(IDC_LIST1);
 			listbox->DeleteString(listbox->FindString(-1, CString(pSock[post].Name)));
 
-			UpdateData();
-
-			for (int j = post; j < number_Socket; j++)
+			Command = _T("0\r\n ");
+			Command += pSock[post].Name;
+			Command += _T(" logout\r\n");
+//			CListBox * listbox = (CListBox *)GetDlgItem(IDC_LIST1);
+			for (int i = 0; i < listbox->GetCount(); i++)
 			{
-				pSock[post].sockClient = pSock[post + 1].sockClient;
-				strcpy(pSock[post].Name, pSock[post + 1].Name);
+				CString te;
+				listbox->GetText(i, te);
+				Command += te;
+				Command += "\r\n";
+			}
+			mSendToAllExcept(wParam, Command);
+			mSend(wParam, Command);
+
+			for (int j = post; j < number_Socket - 1; j++)
+			{
+				pSock[j].sockClient = pSock[j + 1].sockClient;
+				strcpy(pSock[j].Name, pSock[j + 1].Name);
 			}
 			number_Socket--;
 
@@ -342,41 +376,92 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		}
 		case 4: // Required of Group Chat "4\r\n_contentMsg_\r\n"
 		{
-			int post = -1;
-			for (int i = 0; i < number_Socket; i++)
-			{
-				if (pSock[i].sockClient == wParam)
-				{
-					if (i < number_Socket)
-						post = i;
-				}
-			}
-
+			// Update log
 			m_msgString += pSock[post].Name;
 			m_msgString += " send message to Group Chat: ";
-			m_msgString += strResult[2];
+			m_msgString += strResult[1];
 			m_msgString += "\r\n";
+			UpdateData(FALSE);
 
-			Command = pSock[post].Name;
+			// Send result to Client
+			Command = "4\r\n";
+			Command += pSock[post].Name;
 			Command += ": ";
-			Command += strResult[2];
+			Command += strResult[1];
 			Command += "\r\n";
 
+			mSendToAllExcept(wParam, Command);
 
 			break;
 
 		}
 		case 5: // Required of invite private Chat : "5\r\nUsernamePartner\r\n
 		{      // 
+			// Find index of this client and  Partner required
+			int post2 = -1;
+			for (int i = 0; i < number_Socket; i++)
+			{
+				if (pSock[i].Name == strResult[1])
+				{
+					if (i < number_Socket)
+						post2 = i;
+				}
+			}
+		
 
+			if (post == post2) break;
+			if (post2 < 0) {
+				Command = "5\r\n0\r\n"; // 0 mean username partner is not  exist
+				mSend(wParam, Command);
+			}
+			else {
+				if (convAr[post2] != -1) {
+					Command = "5\r\n1\r\n"; // 1 mean partner is in another private chat
+					mSend(wParam, Command);
+				}
+				else {
+					Command = "5\r\n2\r\n"; // 2 mean partner is ready to start private chat
+					mSend(wParam, Command);
+					mSend(pSock[post2].sockClient, Command);
+					convAr[post2] = post;
+					convAr[post] = post2;
+
+					//Update log
+					m_msgString += pSock[post].Name;
+					m_msgString += " start chat private with ";
+					m_msgString += pSock[post2].Name;
+					m_msgString += "\r\n";
+
+					UpdateData(FALSE);
+
+					//pSock[post].isBusy = TRUE;
+					//pSock[post2].isBusy = TRUE;
+				}
+			}
+			break;
 		}
 		case 6: // Required of leave private Chat : "6\r\nUsernamePartner\r\n
 		{      // 
+			// Update log
+			if (convAr[post] == -1) break;
+			m_msgString += pSock[post].Name;
+			m_msgString += " stop chat private with ";
+			m_msgString += pSock[convAr[post]].Name;
+			m_msgString += "\r\n";
+			UpdateData(FALSE);
+
+			Command = "6\r\n2\r\n"; // Notification leave private
+			mSend(wParam, Command);
+			mSend(pSock[convAr[post]].sockClient, Command);
+			// Update vector convAr;
+			convAr[convAr[post]] = -1;
+			convAr[post] = -1;
 			break;
 
 		}
 		case 7: // Required of Send private Chat : "7\r\nUsernamePartner...."
 		{      // 
+
 			break;
 		}
 		case 8: // Required of recieve private Chat : "7\r\nUsernamePartner...."
@@ -385,11 +470,18 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		}
 		case 9: // Required of message private Chat : "7\r\nUsernamePartner-Content'\r\n"
 		{      // 
+			Command = "9\r\n";
+			Command += pSock[post].Name;
+			Command += ": ";
+			Command += strResult[1];
+			Command += "\r\n";
+			mSend(pSock[convAr[post]].sockClient, Command);
+			//mSend(pSock[post].sockClient, Command);
+
 			break;
 		}
-
-		break;
 		}
+		
 		break;
 	}
 	case FD_CLOSE:
@@ -404,27 +496,67 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 					post = i;
 			}
 		}
-		Command = _T("0\r\n ");
-		Command += pSock[post].Name;
-		Command += _T("\r\n0\r\n"); // 0 mean logout
-		mSendToAllExcept(wParam, Command);
+		// Stop private chat if exist
+		if (number_Socket > 1 && convAr[post] != -1) {
+			m_msgString += pSock[post].Name;
+			m_msgString += " stop chat private with ";
+			m_msgString += pSock[convAr[post]].Name;
+			m_msgString += "\r\n";
+			UpdateData(FALSE);
 
+			Command = "6\r\n2\r\n"; // Notification leave private
+			mSend(wParam, Command);
+			mSend(pSock[convAr[post]].sockClient, Command);
+			// Update vector convAr;
+			convAr[convAr[post]] = -1;
+			convAr[post] = -1;
+			for (int i = post; i < number_Socket - 1; i++)
+			{
+				convAr[i] = convAr[i + 1];
+			}
+			for (int i = 0; i < number_Socket; i++)
+			{
+				if (convAr[i] > post)
+				{
+					convAr[i]--;
+				}
+			}
+		}
+
+
+
+		// Update log 
 		m_msgString += pSock[post].Name;
 		m_msgString += " logout\r\n";
 		closesocket(wParam);
+
 		CListBox * listbox = (CListBox *)GetDlgItem(IDC_LIST1);
 		listbox->DeleteString(listbox->FindString(-1, CString(pSock[post].Name)));
 
-		for (int j = post; j < number_Socket; j++)
+		Command = _T("0\r\n ");
+		Command += pSock[post].Name;
+		Command += _T(" logout\r\n");
+		//			CListBox * listbox = (CListBox *)GetDlgItem(IDC_LIST1);
+		for (int i = 0; i < listbox->GetCount(); i++)
 		{
-			pSock[post].sockClient = pSock[post + 1].sockClient;
-			strcpy(pSock[post].Name, pSock[post + 1].Name);
+			CString te;
+			listbox->GetText(i, te);
+			Command += te;
+			Command += "\r\n";
 		}
+		mSendToAllExcept(wParam, Command);
+		mSend(wParam, Command);
+
+		for (int j = post; j < number_Socket - 1; j++)
+		{
+			pSock[j].sockClient = pSock[j + 1].sockClient;
+			strcpy(pSock[j].Name, pSock[j + 1].Name);
+		}
+
 		number_Socket--;
 		UpdateData(FALSE);
 		break;
 	}
-
 	}
 
 	return 0;
@@ -503,7 +635,9 @@ void CServerDlg::OnBnClickedButtonStart()
 	if (err)
 		MessageBox((LPCTSTR)"Cant call WSAAsyncSelect");
 	GetDlgItem(IDC_BUTTON_Start)->EnableWindow(FALSE);
+
 	number_Socket = 0;
+	convAr.resize(number_Socket);
 	pSock = new SockName[200];
 	UpdateData(FALSE);
 
@@ -513,5 +647,5 @@ void CServerDlg::OnBnClickedButtonStart()
 void CServerDlg::OnBnClickedButtonStop()
 {
 	// TODO: Add your control notification handler code here
-	OnCancel();
+	//	OnCancel();
 }
