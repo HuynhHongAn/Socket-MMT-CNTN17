@@ -129,7 +129,6 @@ END_MESSAGE_MAP()
 BOOL CClientDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
@@ -259,6 +258,7 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 			if (flag2 == 1)
 			{
 				MessageBox(_T("Login Successfully!\r\n"));
+				SetWindowText(userName);
 				ShowAllComponent();
 			}
 			if (flag2 == 0)
@@ -284,7 +284,7 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 			if (flag2 == 1)
 			{
 				MessageBox(_T("Sign up Successfully!"));
-
+				SetWindowText(userName);
 			}
 			if (flag2 == 2)
 			{
@@ -347,7 +347,10 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		}
 		case 10:
 		{
-			
+			contentPrivateChat += strResult[1];
+			contentPrivateChat += "\r\n";
+			UpdateData(FALSE);
+			break;
 		}
 				break;
 		}
@@ -533,24 +536,24 @@ void CClientDlg::OnBnClickedButtonAttach()
 {
 	// TODO: Add your attach file code here
 	CFileDialog dlgFile(TRUE);
-	CString fileName;
-	const int c_cMaxFiles = 100;
+	/*const int c_cMaxFiles = 100;
 	const int c_cbBuffSize = (c_cMaxFiles * (MAX_PATH + 1)) + 1;
 	dlgFile.GetOFN().lpstrFile = fileName.GetBuffer(c_cbBuffSize);
 	dlgFile.GetOFN().nMaxFile = c_cbBuffSize;
-	/*dlgFile.DoModal();
+	dlgFile.DoModal();
 	fileName.ReleaseBuffer();*/
 
 	if (dlgFile.DoModal() == IDOK)
 	{
 		CString PathName = dlgFile.GetPathName();
+		CString fileName = dlgFile.GetFileName();
 		// Do something with 'PathName'
-		Command = "9\r\n";
+		Command = "10\r\n";
 		Command += PathName;
 		Command += "\r\n";
 		mSend(Command);
-		contentPrivateChat += "You: ";
-		contentPrivateChat += "Hi World!";
+		contentPrivateChat += "You sent a file: ";
+		contentPrivateChat += fileName;
 		contentPrivateChat += "\r\n";
 		SetDlgItemText(IDC_editMessage, L"");
 		UpdateData(FALSE);

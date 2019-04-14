@@ -46,7 +46,7 @@ END_MESSAGE_MAP()
 BOOL CServerDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+	SetWindowText(_T("Admin"));
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
@@ -482,7 +482,13 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		}
 		case 10: //Required of recieve file : "10\r\nfileName\r\n"
 		{
-
+			Command = "10\r\n";
+			Command += pSock[post].Name;
+			Command += " sent you a file: ";
+			Command += strResult[1];
+			Command += "\r\n";
+			mSend(pSock[convAr[post]].sockClient, Command);
+			break;
 		}
 
 		}
@@ -652,5 +658,5 @@ void CServerDlg::OnBnClickedButtonStart()
 void CServerDlg::OnBnClickedButtonStop()
 {
 	// TODO: Add your control notification handler code here
-	//	OnCancel();
+	OnCancel();
 }
