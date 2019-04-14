@@ -378,7 +378,7 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		{
 			// Update log
 			m_msgString += pSock[post].Name;
-			m_msgString += " send message to Group Chat: ";
+			m_msgString += " sent message to Group Chat: ";
 			m_msgString += strResult[1];
 			m_msgString += "\r\n";
 			UpdateData(FALSE);
@@ -428,7 +428,7 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 
 					//Update log
 					m_msgString += pSock[post].Name;
-					m_msgString += " start chat private with ";
+					m_msgString += " started chat private with ";
 					m_msgString += pSock[post2].Name;
 					m_msgString += "\r\n";
 
@@ -445,7 +445,7 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 			// Update log
 			if (convAr[post] == -1) break;
 			m_msgString += pSock[post].Name;
-			m_msgString += " stop chat private with ";
+			m_msgString += " stopped chat private with ";
 			m_msgString += pSock[convAr[post]].Name;
 			m_msgString += "\r\n";
 			UpdateData(FALSE);
@@ -480,6 +480,11 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 
 			break;
 		}
+		case 10: //Required of recieve file : "10\r\nfileName\r\n"
+		{
+
+		}
+
 		}
 		
 		break;
@@ -499,7 +504,7 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		// Stop private chat if exist
 		if (number_Socket > 1 && convAr[post] != -1) {
 			m_msgString += pSock[post].Name;
-			m_msgString += " stop chat private with ";
+			m_msgString += " stopped chat private with ";
 			m_msgString += pSock[convAr[post]].Name;
 			m_msgString += "\r\n";
 			UpdateData(FALSE);
@@ -633,7 +638,7 @@ void CServerDlg::OnBnClickedButtonStart()
 	listen(sockServer, 5);
 	int err = WSAAsyncSelect(sockServer, m_hWnd, WM_SOCKET, FD_READ | FD_ACCEPT | FD_CLOSE);
 	if (err)
-		MessageBox((LPCTSTR)"Cant call WSAAsyncSelect");
+		MessageBox((LPCTSTR)"Cannot call WSAAsyncSelect");
 	GetDlgItem(IDC_BUTTON_Start)->EnableWindow(FALSE);
 
 	number_Socket = 0;

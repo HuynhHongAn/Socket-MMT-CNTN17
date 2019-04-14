@@ -23,6 +23,7 @@ public:
 // Overrides
 public:
 	virtual BOOL InitInstance();
+	BOOL CClientApp::GetFileFromRemoteSender(CString strIP, CString fName);
 
 // Implementation
 

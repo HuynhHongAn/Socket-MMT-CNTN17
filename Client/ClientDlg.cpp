@@ -258,7 +258,7 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		case 1: {
 			if (flag2 == 1)
 			{
-				MessageBox(_T("Success\r\n"));
+				MessageBox(_T("Login Successfully!\r\n"));
 				ShowAllComponent();
 			}
 			if (flag2 == 0)
@@ -283,7 +283,7 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 			}
 			if (flag2 == 1)
 			{
-				MessageBox(_T("Sign Up success!!"));
+				MessageBox(_T("Sign up Successfully!"));
 
 			}
 			if (flag2 == 2)
@@ -295,7 +295,7 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		case 3: { // Required logout
-			MessageBox(_T("Logout\n"));
+			MessageBox(_T("Logout Successfully!\n"));
 			closesocket(sClient);
 			HideAllComponent();
 			break;
@@ -345,6 +345,10 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 
 			break;
 		}
+		case 10:
+		{
+			
+		}
 				break;
 		}
 		UpdateData(FALSE);
@@ -353,7 +357,10 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 	case FD_CLOSE:
 	{
 		closesocket(sClient);
-		MessageBox(_T("Server close the connection\r\n"));
+		if (_ttoi(strResult[0]) != 3) {
+			MessageBox(_T("Server close the connection\r\n"));
+		}
+		
 		UpdateData(FALSE);
 		break;
 	}
@@ -388,7 +395,7 @@ void CClientDlg::OnBnClickedButtonlogin()
 		host = (gethostbyname(cpy_IP));
 		if (host == NULL)
 		{
-			MessageBox(_T("Khong the ket noi den server."), _T("ERROR"), 0);
+			MessageBox(_T("Cannot connect to server."), _T("ERROR"), 0);
 		}
 		CopyMemory(&servAdd.sin_addr, host->h_addr_list[0],
 			host->h_length);
@@ -397,7 +404,7 @@ void CClientDlg::OnBnClickedButtonlogin()
 
 	int err = connect(sClient, (struct sockaddr*)&servAdd, sizeof(servAdd));
 	if (err == SOCKET_ERROR) {
-		MessageBox(_T("Ket noi that bai"), _T("ERROR"), 0);
+		MessageBox(_T("Fail to connect to server."), _T("ERROR"), 0);
 		return;
 	}
 
@@ -407,7 +414,7 @@ void CClientDlg::OnBnClickedButtonlogin()
 	GetDlgItemText(IDC_editPassWord, password);
 	if (!user.GetLength() || !password.GetLength())
 	{
-		MessageBox(_T("Username or password can not be blank"));
+		MessageBox(_T("Username or password cannot be blank"));
 		return;
 	}
 
@@ -449,7 +456,7 @@ void CClientDlg::OnBnClickedButtonsignup()
 		host = (gethostbyname(cpy_IP));
 		if (host == NULL)
 		{
-			MessageBox(_T("Can not connect to server."), _T("ERROR"), 0);
+			MessageBox(_T("Cannot connect to server."), _T("ERROR"), 0);
 		}
 		CopyMemory(&servAdd.sin_addr, host->h_addr_list[0],
 			host->h_length);
@@ -470,7 +477,7 @@ void CClientDlg::OnBnClickedButtonsignup()
 	GetDlgItemText(IDC_editPassWord, password);
 	if (!user.GetLength() || !password.GetLength())
 	{
-		MessageBox(_T("Username or password can not be blank"));
+		MessageBox(_T("Username or password cannot be blank"));
 		return;
 	}
 
@@ -524,7 +531,35 @@ void CClientDlg::OnBnClickedButtonPrivatesend()
 
 void CClientDlg::OnBnClickedButtonAttach()
 {
-	// TODO: Add your control notification handler code here
+	// TODO: Add your attach file code here
+	CFileDialog dlgFile(TRUE);
+	CString fileName;
+	const int c_cMaxFiles = 100;
+	const int c_cbBuffSize = (c_cMaxFiles * (MAX_PATH + 1)) + 1;
+	dlgFile.GetOFN().lpstrFile = fileName.GetBuffer(c_cbBuffSize);
+	dlgFile.GetOFN().nMaxFile = c_cbBuffSize;
+	/*dlgFile.DoModal();
+	fileName.ReleaseBuffer();*/
+
+	if (dlgFile.DoModal() == IDOK)
+	{
+		CString PathName = dlgFile.GetPathName();
+		// Do something with 'PathName'
+		Command = "9\r\n";
+		Command += PathName;
+		Command += "\r\n";
+		mSend(Command);
+		contentPrivateChat += "You: ";
+		contentPrivateChat += "Hi World!";
+		contentPrivateChat += "\r\n";
+		SetDlgItemText(IDC_editMessage, L"");
+		UpdateData(FALSE);
+	}
+	
+
+	//GetDlgItemText(IDC_editMessage, fileName);
+	
+
 }
 
 

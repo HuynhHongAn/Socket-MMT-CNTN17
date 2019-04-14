@@ -23,6 +23,7 @@ public:
 // Overrides
 public:
 	virtual BOOL InitInstance();
+	bool CServerApp::SendFileToRemoteRecipient(CString fName);
 
 // Implementation
 

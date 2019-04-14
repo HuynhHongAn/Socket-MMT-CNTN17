@@ -9,6 +9,8 @@ using namespace std;
 
 #define PORT 25000
 #define WM_SOCKET WM_USER+1
+#define SEND_BUFFER_SIZE 4096
+
 // CServerDlg dialog
 class CServerDlg : public CDialogEx
 {

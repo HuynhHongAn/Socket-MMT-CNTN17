@@ -5,6 +5,7 @@
 #pragma once
 #define PORT 25000
 #define WM_SOCKET WM_USER+2
+#define RECV_BUFFER_SIZE 4096
 
 
 // CClientDlg dialog
