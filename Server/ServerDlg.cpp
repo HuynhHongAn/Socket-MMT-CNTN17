@@ -179,7 +179,7 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		CString temp;
 		if (mRecv(wParam, temp) < 0)
 			break;
-		Split(temp, strResult);
+		int nArg = FullSplit(temp, strResult, L"\r\n");
 		int flag = _ttoi(strResult[0]);
 		if (flag == 1 || flag == 2)
 		{
@@ -482,12 +482,43 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		}
 		case 10: //Required of recieve file : "10\r\nfileName\r\n"
 		{
-			Command = "10\r\n";
+			/*Command = "10\r\n";
 			Command += pSock[post].Name;
 			Command += " sent you a file: ";
 			Command += strResult[1];
 			Command += "\r\n";
 			mSend(pSock[convAr[post]].sockClient, Command);
+			break;*/
+			if (nArg == 4) {		// set up
+				CString fullFileName = strResult[1];
+				CString fileName = fullFileName.Mid(fullFileName.ReverseFind('\\') + 1);
+
+				Command = "10\r\n";
+				Command += pSock[post].Name;
+				Command += " send file ";
+				CString number;
+				number.Format(L"%d-", fileMapping.size());
+				Command += number + fileName;
+				Command += "\r\n";
+
+				FILE* fp = fopen(toString(number + fileName).c_str(), "wb");
+				fileMapping[make_pair(wParam, _ttoi(strResult[2]))] = fp;
+				mSendToAllExcept(wParam, Command);
+			}
+
+			if (nArg == 3) {
+				int code = _ttoi(strResult[1]);
+				FILE *fp = fileMapping[make_pair(wParam, code)];
+
+				CString data = strResult[2];
+				int Len = data.GetLength();
+				Len += Len;
+				PBYTE sendBuff = new BYTE[1000];
+				memset(sendBuff, 0, 1000);
+				memcpy(sendBuff, (PBYTE)(LPCTSTR)data, Len);
+				fwrite((char*)sendBuff, 1, Len, fp);
+			}
+
 			break;
 		}
 
@@ -594,6 +625,25 @@ void CServerDlg::Split(CString src, CString des[2])
 	p2 = src.Find(_T("\r\n"), p1 + 1);
 	des[1] = src.Mid(p1 + 2, p2 - (p1 + 2));
 
+}
+
+int CServerDlg::FullSplit(CString src, CString des[], CString token)
+{
+	int nTokenPos = 0;
+	int nToken = 0;
+	CString strToken = src.Tokenize(token, nTokenPos);
+	while (!strToken.IsEmpty())
+	{
+		des[nToken++] = strToken;
+		strToken = src.Tokenize(token, nTokenPos);
+	}
+	return nToken;
+}
+
+std::string CServerDlg::toString(CString s)
+{
+	CT2CA tmp(s);
+	return std::string(tmp);
 }
 
 char* CServerDlg::ConvertToChar(const CString &s)

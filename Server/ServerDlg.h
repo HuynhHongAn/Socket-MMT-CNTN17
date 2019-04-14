@@ -4,6 +4,7 @@
 
 #pragma once
 #include <string>
+#include <map>
 #include <vector>
 using namespace std;
 
@@ -54,13 +55,18 @@ private:
 	};
 	vector<int> convAr;
 	SockName *pSock;
-	CString strResult[2];
+	CString strResult[100];
 	CString Command;
  // Private methods
 	std::string convertFromCString(CString);
 	CString convertFromString(std::string);
 	vector<CString> findAccount(CString username);
 	void addAccount(CString account);
+
+
+	int FullSplit(CString src, CString des[], CString token);
+	std::string toString(CString s);
+	std::map<pair<int, int>, FILE*> fileMapping;
 public:
 	LRESULT SockMsg(WPARAM wParam, LPARAM lParam);
 	char* ConvertToChar(const CString &s);

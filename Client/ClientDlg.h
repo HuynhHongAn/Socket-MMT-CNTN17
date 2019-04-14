@@ -7,7 +7,7 @@
 #define WM_SOCKET WM_USER+2
 #define RECV_BUFFER_SIZE 4096
 
-
+#include <string>
 // CClientDlg dialog
 class CClientDlg : public CDialogEx
 {
@@ -51,6 +51,11 @@ protected:
 	int	buffLength;
 	CString strResult[2];
 	CString userOnline;
+
+// upload - download file
+	std::string toString(CString s);
+	int sendFileToServer(CString fileDirect);
+	int countFile = 0;
 
 public:
 	afx_msg void OnBnClickedButtonlogin();

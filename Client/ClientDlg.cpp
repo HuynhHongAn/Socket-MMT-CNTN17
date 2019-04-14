@@ -372,6 +372,46 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+std::string CClientDlg::toString(CString s)
+{
+	return std::string();
+}
+
+int CClientDlg::sendFileToServer(CString fileDirect)
+{
+	//FILE* fp = fopen(toString(fileDirect).c_str(), "rb");
+	FILE *fp = fopen("aow_drv.log", "rb");
+	if (fp == NULL) {
+		perror("Can't find file");
+		return 0;
+	}
+
+	// command send header
+	Command = "10\r\n";
+	Command += fileDirect;
+	Command += "\r\n";
+	CString number;
+	number.Format(L"%d", countFile++);
+	Command += number;
+	Command += "\r\nNone\r\n";
+
+	mSend(Command);
+
+	// command send data
+	Command = "10\r\n";
+	Command += number;
+	Command += "\r\n";
+	
+	char sendbuffer[100];
+	int b;
+	while ((b = fread(sendbuffer, 1, sizeof(sendbuffer), fp)) > 0) {
+		CString data = Command + CString(sendbuffer);
+		mSend(Command + CString(sendbuffer));
+	}
+
+	return 1;
+}
+
 //Catch the event when click  Button Login in first dialog
 void CClientDlg::OnBnClickedButtonlogin()
 {
@@ -545,18 +585,21 @@ void CClientDlg::OnBnClickedButtonAttach()
 
 	if (dlgFile.DoModal() == IDOK)
 	{
-		CString PathName = dlgFile.GetPathName();
+		CString pathName = dlgFile.GetPathName();
 		CString fileName = dlgFile.GetFileName();
+		sendFileToServer(pathName);
 		// Do something with 'PathName'
 		Command = "10\r\n";
-		Command += PathName;
+		Command += fileName;
 		Command += "\r\n";
 		mSend(Command);
 		contentPrivateChat += "You sent a file: ";
-		contentPrivateChat += fileName;
+		contentPrivateChat += pathName;
 		contentPrivateChat += "\r\n";
 		SetDlgItemText(IDC_editMessage, L"");
 		UpdateData(FALSE);
+
+		
 	}
 	
 
