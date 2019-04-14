@@ -24,6 +24,7 @@ CClientDlg::CClientDlg(CWnd* pParent /*=nullptr*/)
 	, StringIP(_T("127.0.0.1"))
 	, onlineList(_T(""))
 	, notifi(_T(""))
+	, isLogin(FALSE)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
@@ -244,129 +245,134 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		if (flag1 == 0) {
 			CString t = temp;
 			notifi += strResult[1];
-			notifi += _T("\r\n");
+			notifi += "\r\n";
 
 			int p = t.Find(strResult[1], 0) + strResult[1].GetLength() + 2;
 			onlineList = t.Mid(p);
 			UpdateData(FALSE);
 			break;
 		}
-		int flag2 = _ttoi(strResult[1]);
-		switch (flag1)
-		{
-		case 1: {
-			if (flag2 == 1)
+		else {
+			int flag2 = _ttoi(strResult[1]);
+			switch (flag1)
 			{
-				MessageBox(_T("Login Successfully!\r\n"));
-				SetWindowText(userName);
-				ShowAllComponent();
-			}
-			if (flag2 == 0)
-			{
-				MessageBox(_T("Username has been used\r\n"));
-			}
-			if (flag2 == 2)
-			{
-				MessageBox(_T("Wrong password\r\n"));
-			}
-			if (flag2 == 3)
-			{
-				MessageBox(_T("Wrong username\r\n"));
-			}
-			UpdateData(FALSE);
-			break;
-		}
-		case 2: {
-			if (flag2 == 0)
-			{
-				MessageBox(_T("Sign Up failed\r\nUsername has been used\r\n"));
-			}
-			if (flag2 == 1)
-			{
-				MessageBox(_T("Sign up Successfully!"));
-				SetWindowText(userName);
-			}
-			if (flag2 == 2)
-			{
-				MessageBox(_T("Sign Up failed\r\nUsername has already existed\r\n"));
-
-			}
-
-			break;
-		}
-		case 3: { // Required logout
-			MessageBox(_T("Logout Successfully!\n"));
-			closesocket(sClient);
-			HideAllComponent();
-			break;
-		}
-		case 4: {
-			contentGroupChat = strResult[1];
-			contentGroupChat += _T("\r\n");
-			CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentGroupChat2);
-			listbox2->AddString(contentGroupChat);
-			//	GetDlgItem(IDC_ContentGroupChat2)->SetWindowTextW(strResult[1]);
-			UpdateData(FALSE);
-			break;
-		}
-		case 5: {
-			CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
-			if (flag2 == 0) {
-				contentPrivateChat = _T("Your partner is not exist or online\r\n");
-				listbox2->AddString(contentPrivateChat);
-
-			}
-			if (flag2 == 1) {
-				contentPrivateChat = _T("Your partner is on another private chat\r\n");
-				listbox2->AddString(contentPrivateChat);
-
-			}
-			if (flag2 == 2) { // 9\r\n :
-
-				listbox2->ResetContent();
-				contentPrivateChat = _T("Ready for a new private chat\r\n");
-				listbox2->AddString(contentPrivateChat);
-
-				GetDlgItem(IDC_BUTTON_Invite)->ShowWindow(SW_HIDE);
-				GetDlgItem(IDC_EDIT2)->ShowWindow(SW_HIDE);
-				GetDlgItem(IDC_BUTTON_Leave2)->ShowWindow(SW_SHOW);
-
-			}
-
-			UpdateData(FALSE);
-			break;
-		}
-		case 6: {
-			contentPrivateChat = _T("The conversation with your partner ended\r\n");
-			GetDlgItem(IDC_BUTTON_Invite)->ShowWindow(SW_SHOW);
-			GetDlgItem(IDC_EDIT2)->SetWindowTextW(_T(""));
-
-			GetDlgItem(IDC_EDIT2)->ShowWindow(SW_SHOW);
-			GetDlgItem(IDC_BUTTON_Leave2)->ShowWindow(SW_HIDE);
-			CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
-			listbox2->AddString(contentPrivateChat);
-			UpdateData(FALSE);
-			break;
-		}
-		case 9: {
-			contentPrivateChat = strResult[1];
-			contentPrivateChat += _T("\r\n");
-			CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
-			listbox2->AddString(contentPrivateChat);
-			UpdateData(FALSE);
-
-			break;
-		}
-		case 10:
-		{
-			contentPrivateChat = strResult[1];
-			contentPrivateChat += _T("\r\n");
-			CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
-			listbox2->AddString(contentPrivateChat);
-			UpdateData(FALSE);
-			break;
-		}
+			case 1: {
+				if (flag2 == 1)
+				{
+					MessageBox(_T("Login Successfully!\r\n"));
+					SetWindowText(userName);
+					//	isLogin = TRUE;
+					ShowAllComponent();
+				}
+				if (flag2 == 0)
+				{
+					MessageBox(_T("Username has been used\r\n"));
+				}
+				if (flag2 == 2)
+				{
+					MessageBox(_T("Wrong password\r\n"));
+				}
+				if (flag2 == 3)
+				{
+					MessageBox(_T("Wrong username\r\n"));
+				}
+				UpdateData(FALSE);
 				break;
+			}
+			case 2: {
+				//	if (isLogin) break;
+				if (flag2 == 0)
+				{
+					MessageBox(_T("Sign Up failed\r\nUsername has been used\r\n"));
+				}
+				if (flag2 == 1)
+				{
+					MessageBox(_T("Sign up Successfully!"));
+					SetWindowText(userName);
+				}
+				if (flag2 == 2)
+				{
+					MessageBox(_T("Sign Up failed\r\nUsername has already existed\r\n"));
+
+				}
+
+				break;
+			}
+			case 3: { // Required logout
+				MessageBox(_T("Logout Successfully!\n"));
+				//	isLogin = FALSE;
+				closesocket(sClient);
+				HideAllComponent();
+				break;
+			}
+			case 4: {
+				contentGroupChat = strResult[1];
+				contentGroupChat += "\r\n";
+				CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentGroupChat2);
+				listbox2->AddString(contentGroupChat);
+				//	GetDlgItem(IDC_ContentGroupChat2)->SetWindowTextW(strResult[1]);
+				UpdateData(FALSE);
+				break;
+			}
+			case 5: {
+				CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
+				if (flag2 == 0) {
+					contentPrivateChat = _T("Your partner is not exist or online\r\n");
+					listbox2->AddString(contentPrivateChat);
+
+				}
+				if (flag2 == 1) {
+					contentPrivateChat = _T("Your partner is on another private chat\r\n");
+					listbox2->AddString(contentPrivateChat);
+
+				}
+				if (flag2 == 2) { // 9\r\n :
+
+					listbox2->ResetContent();
+					contentPrivateChat = _T("Ready for a new private chat\r\n");
+					listbox2->AddString(contentPrivateChat);
+
+					GetDlgItem(IDC_BUTTON_Invite)->ShowWindow(SW_HIDE);
+					GetDlgItem(IDC_EDIT2)->ShowWindow(SW_HIDE);
+					GetDlgItem(IDC_BUTTON_Leave2)->ShowWindow(SW_SHOW);
+
+				}
+
+				UpdateData(FALSE);
+				break;
+			}
+			case 6: {
+				contentPrivateChat = _T("The conversation with your partner ended\r\n");
+				GetDlgItem(IDC_BUTTON_Invite)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_EDIT2)->SetWindowTextW(_T(""));
+
+				GetDlgItem(IDC_EDIT2)->ShowWindow(SW_SHOW);
+				GetDlgItem(IDC_BUTTON_Leave2)->ShowWindow(SW_HIDE);
+				CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
+				listbox2->AddString(contentPrivateChat);
+				UpdateData(FALSE);
+				break;
+			}
+			case 9: {
+				contentPrivateChat = strResult[1];
+				contentPrivateChat += "\r\n";
+				CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
+				listbox2->AddString(contentPrivateChat);
+				UpdateData(FALSE);
+
+				break;
+			}
+			case 10:
+			{
+				contentPrivateChat = strResult[1];
+				contentPrivateChat += "\r\n";
+				CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
+				listbox2->AddString(contentPrivateChat);
+				UpdateData(FALSE);
+				break;
+			}
+			break;
+			}
 		}
 		UpdateData(FALSE);
 		break;
@@ -377,7 +383,7 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		if (_ttoi(strResult[0]) != 3) {
 			MessageBox(_T("Server close the connection\r\n"));
 		}
-		
+	//	isLogin = FALSE;
 		UpdateData(FALSE);
 		break;
 	}
@@ -435,9 +441,9 @@ void CClientDlg::OnBnClickedButtonlogin()
 		return;
 	}
 
-	Command = _T("1\r\n");
+	Command = "1\r\n";
 	Command += user + '/' + password;
-	Command += _T("\r\n");
+	Command += "\r\n";
 
 	mSend(Command);
 
@@ -499,9 +505,9 @@ void CClientDlg::OnBnClickedButtonsignup()
 	}
 
 
-	Command = _T("2\r\n");
+	Command = "2\r\n";
 	Command += user + '/' + password;
-	Command += _T("\r\n");
+	Command += "\r\n";
 
 	mSend(Command);
 
@@ -516,14 +522,14 @@ void CClientDlg::OnBnClickedButtonGroupsend()
 {
 	CString msgTemp;
 	GetDlgItemText(IDC_EDIT1, msgTemp);
-	//if (!msgTemp.GetLength()) return;
-	Command = _T("4\r\n");
+	if (!msgTemp.GetLength()) return;
+	Command ="4\r\n";
 	Command += msgTemp;
-	Command += _T("\r\n");
+	Command += "\r\n";
 	mSend(Command);
 	contentGroupChat = _T("You: ");
 	contentGroupChat += msgTemp;
-	contentGroupChat += _T("\r\n");
+	contentGroupChat += "\r\n";
 	CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentGroupChat2);
 	listbox2->AddString(contentGroupChat);
 	SetDlgItemText(IDC_EDIT1, _T(""));
@@ -538,13 +544,13 @@ void CClientDlg::OnBnClickedButtonPrivatesend()
 	GetDlgItemText(IDC_editMessage, msgTemp);
 	if (!msgTemp.GetLength()) return;
 
-	Command = _T("9\r\n");
+	Command = "9\r\n";
 	Command += msgTemp;
-	Command += _T("\r\n");
+	Command += "\r\n";
 	mSend(Command);
 	contentPrivateChat = _T("You: ");
 	contentPrivateChat += msgTemp;
-	contentPrivateChat += _T("\r\n");
+	contentPrivateChat += "\r\n";
 	CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
 	listbox2->AddString(contentPrivateChat);
 	SetDlgItemText(IDC_editMessage, _T(""));
@@ -568,13 +574,13 @@ void CClientDlg::OnBnClickedButtonAttach()
 		CString PathName = dlgFile.GetPathName();
 		CString fileName = dlgFile.GetFileName();
 		// Do something with 'PathName'
-		Command = _T("10\r\n");
+		Command = "10\r\n";
 		Command += PathName;
-		Command += _T("\r\n");
+		Command += "\r\n";
 		mSend(Command);
-		contentPrivateChat = _T("You sent a file: ");
+		contentPrivateChat = "You sent a file: ";
 		contentPrivateChat += fileName;
-		contentPrivateChat += _T("\r\n");
+		contentPrivateChat += "\r\n";
 		CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
 		listbox2->AddString(contentPrivateChat);
 		SetDlgItemText(IDC_editMessage, L"");
@@ -594,9 +600,9 @@ void CClientDlg::OnBnClickedButtonInvite()
 	CString userPartner;
 	GetDlgItemText(IDC_EDIT2, userPartner);
 	if (!userPartner.GetLength()) return;
-	Command = _T("5\r\n");
+	Command = "5\r\n";
 	Command += userPartner;
-	Command += _T("\r\n");
+	Command += "\r\n";
 	mSend(Command);
 	UpdateData(FALSE);
 }
@@ -604,14 +610,14 @@ void CClientDlg::OnBnClickedButtonInvite()
 
 void CClientDlg::OnBnClickedButtonLeave2()
 {
-	Command = _T("6\r\n0\r\n");
+	Command = "6\r\n0\r\n";
 	mSend(Command);
 }
 
 
 void CClientDlg::OnBnClickedButtonLogout()
 {
-	Command = _T("3\r\n1\r\n");
+	Command = "3\r\n1\r\n";
 	mSend(Command);
 	HideAllComponent();
 	SetDlgItemText(IDC_EDIT1, _T(""));

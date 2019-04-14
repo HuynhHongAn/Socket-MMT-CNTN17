@@ -51,7 +51,7 @@ protected:
 	int	buffLength;
 	CString strResult[2];
 	CString userOnline;
-
+	bool isLogin;
 public:
 	afx_msg void OnBnClickedButtonlogin();
 	afx_msg void OnBnClickedButtonsignup();

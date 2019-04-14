@@ -23,7 +23,8 @@ CServerDlg::CServerDlg(CWnd* pParent /*=nullptr*/)
 	, m_msgString(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-
+	convAr.resize(200);
+	for (int i = 0; i < 200; i++) convAr[i] = -1;
 }
 
 void CServerDlg::DoDataExchange(CDataExchange* pDX)
@@ -215,7 +216,7 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 							// Update List Online
 							CListBox * listbox = (CListBox *)GetDlgItem(IDC_LIST1);
 							listbox->AddString(CtempUser);
-							convAr.push_back(-1);
+							//convAr[post] = -1;
 
 							//  Send to all client except the sender client
 							Command = _T("0\r\n ");
@@ -258,7 +259,6 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 				else // account has been used => login failed
 				{
 					Command = _T("1\r\n0\r\n");
-
 					mSend(wParam, Command);
 					UpdateData(FALSE);
 
@@ -318,8 +318,6 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		{
 		case 3: // Logout Required "3\r\n1\r\n" , always send to all client
 		{
-		
-
 			if (convAr[post] != -1) {
 
 				Command = _T("6\r\n2\r\n"); // Notification leave private
@@ -367,7 +365,7 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 				CString te;
 				listbox->GetText(i, te);
 				Command += te;
-				Command += _T("\r\n");
+				Command += "\r\n";
 			}
 			mSendToAllExcept(wParam, Command);
 			mSend(wParam, Command);
@@ -389,18 +387,18 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 			m_msgString = pSock[post].Name;
 			m_msgString += _T(" send message to Group Chat: ");
 			m_msgString += strResult[1];
-			m_msgString += _T("\r\n");
+			m_msgString += "\r\n";
 			CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_log);
 			listbox2->AddString(m_msgString);
 			UpdateData(FALSE);
 
 
 			// Send result to Client
-			Command = _T("4\r\n");
+			Command = "4\r\n";
 			Command += pSock[post].Name;
-			Command += _T(": ");
+			Command += ": ";
 			Command += strResult[1];
-			Command += _T("\r\n");
+			Command += "\r\n";
 
 			mSendToAllExcept(wParam, Command);
 
@@ -423,16 +421,16 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 
 			if (post == post2) break;
 			if (post2 < 0) {
-				Command = _T("5\r\n0\r\n"); // 0 mean username partner is not  exist
+				Command = "5\r\n0\r\n"; // 0 mean username partner is not  exist
 				mSend(wParam, Command);
 			}
 			else {
 				if (convAr[post2] != -1) {
-					Command = _T("5\r\n1\r\n"); // 1 mean partner is in another private chat
+					Command = "5\r\n1\r\n"; // 1 mean partner is in another private chat
 					mSend(wParam, Command);
 				}
 				else {
-					Command = _T("5\r\n2\r\n"); // 2 mean partner is ready to start private chat
+					Command = "5\r\n2\r\n"; // 2 mean partner is ready to start private chat
 					mSend(wParam, Command);
 					mSend(pSock[post2].sockClient, Command);
 					convAr[post2] = post;
@@ -440,9 +438,9 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 
 					//Update log
 					m_msgString = pSock[post].Name;
-					m_msgString += _T(" start chat private with ");
+					m_msgString += " start chat private with ";
 					m_msgString += pSock[post2].Name;
-					m_msgString += _T("\r\n");
+					m_msgString += "\r\n";
 					CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_log);
 					listbox2->AddString(m_msgString);
 					UpdateData(FALSE);
@@ -459,15 +457,15 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 			if (convAr[post] == -1) break;
 
 			m_msgString = pSock[post].Name;
-			m_msgString += _T(" stop chat private with ");
+			m_msgString += " stop chat private with ";
 			m_msgString += pSock[convAr[post]].Name;
-			m_msgString += _T("\r\n");
+			m_msgString += "\r\n";
 			CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_log);
 			listbox2->AddString(m_msgString);
 
 			UpdateData(FALSE);
 
-			Command = _T("6\r\n2\r\n"); // Notification leave private
+			Command = "6\r\n2\r\n"; // Notification leave private
 			mSend(wParam, Command);
 			mSend(pSock[convAr[post]].sockClient, Command);
 			// Update vector convAr;
@@ -487,20 +485,20 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		}
 		case 9: // Required of message private Chat : "7\r\nUsernamePartner-Content'\r\n"
 		{      // 
-			Command = _T("9\r\n");
+			Command = "9\r\n";
 			Command += pSock[post].Name;
-			Command += _T(": ");
+			Command += ": ";
 			Command += strResult[1];
-			Command += _T("\r\n");
+			Command += "\r\n";
 			mSend(pSock[convAr[post]].sockClient, Command);
 
 			//mSend(pSock[post].sockClient, Command);
 			m_msgString = pSock[post].Name;
-			m_msgString += _T(" send to ");
+			m_msgString += " send to ";
 			m_msgString += pSock[convAr[post]].Name;
-			m_msgString += _T(": ");
+			m_msgString += ": ";
 			m_msgString += strResult[1];
-			m_msgString += _T("\r\n");
+			m_msgString += "\r\n";
 
 			CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_log);
 			listbox2->AddString(m_msgString);
@@ -509,11 +507,11 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		}
 		case 10: //Required of recieve file : "10\r\nfileName\r\n"
 		{
-			Command = _T("10\r\n");
+			Command = "10\r\n";
 			Command += pSock[post].Name;
-			Command += _T(" sent you a file: ");
+			Command += " sent you a file: ";
 			Command += strResult[1];
-			Command += _T("\r\n");
+			Command += "\r\n";
 			mSend(pSock[convAr[post]].sockClient, Command);
 			break;
 		}
@@ -538,14 +536,14 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		// Stop private chat if exist
 		if (number_Socket > 1 && convAr[post] != -1) {
 			m_msgString = pSock[post].Name;
-			m_msgString += _T(" stop chat private with ");
+			m_msgString += " stop chat private with ";
 			m_msgString += pSock[convAr[post]].Name;
-			m_msgString += _T("\r\n");
+			m_msgString += "\r\n";
 			listbox2->AddString(m_msgString);
 
 			UpdateData(FALSE);
 
-			Command = _T("6\r\n2\r\n"); // Notification leave private
+			Command = "6\r\n2\r\n"; // Notification leave private
 			mSend(wParam, Command);
 			mSend(pSock[convAr[post]].sockClient, Command);
 			// Update vector convAr;
@@ -577,16 +575,16 @@ LRESULT CServerDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		CListBox * listbox = (CListBox *)GetDlgItem(IDC_LIST1);
 		listbox->DeleteString(listbox->FindString(-1, CString(pSock[post].Name)));
 
-		Command = _T("0\r\n ");
+		Command = "0\r\n ";
 		Command += pSock[post].Name;
-		Command += _T(" logout\r\n");
+		Command += " logout\r\n";
 		//			CListBox * listbox = (CListBox *)GetDlgItem(IDC_LIST1);
 		for (int i = 0; i < listbox->GetCount(); i++)
 		{
 			CString te;
 			listbox->GetText(i, te);
 			Command += te;
-			Command += _T("\r\n");
+			Command += "\r\n";
 		}
 		mSendToAllExcept(wParam, Command);
 		mSend(wParam, Command);
