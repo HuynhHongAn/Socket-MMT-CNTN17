@@ -244,7 +244,7 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 		if (flag1 == 0) {
 			CString t = temp;
 			notifi += strResult[1];
-			notifi += "\r\n";
+			notifi += _T("\r\n");
 
 			int p = t.Find(strResult[1], 0) + strResult[1].GetLength() + 2;
 			onlineList = t.Mid(p);
@@ -301,54 +301,68 @@ LRESULT CClientDlg::SockMsg(WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		case 4: {
-			contentGroupChat += strResult[1];
-			contentGroupChat += "\r\n";
+			contentGroupChat = strResult[1];
+			contentGroupChat += _T("\r\n");
+			CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentGroupChat2);
+			listbox2->AddString(contentGroupChat);
 			//	GetDlgItem(IDC_ContentGroupChat2)->SetWindowTextW(strResult[1]);
 			UpdateData(FALSE);
 			break;
 		}
 		case 5: {
-
-
+			CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
 			if (flag2 == 0) {
-				contentPrivateChat = "Your partner is not exist or online\r\n";
+				contentPrivateChat = _T("Your partner is not exist or online\r\n");
+				listbox2->AddString(contentPrivateChat);
+
 			}
 			if (flag2 == 1) {
-				contentPrivateChat = "Your partner is on another private chat\r\n";
+				contentPrivateChat = _T("Your partner is on another private chat\r\n");
+				listbox2->AddString(contentPrivateChat);
+
 			}
 			if (flag2 == 2) { // 9\r\n :
-				contentPrivateChat = "Ready for a new private chat\r\n";
+
+				listbox2->ResetContent();
+				contentPrivateChat = _T("Ready for a new private chat\r\n");
+				listbox2->AddString(contentPrivateChat);
+
 				GetDlgItem(IDC_BUTTON_Invite)->ShowWindow(SW_HIDE);
 				GetDlgItem(IDC_EDIT2)->ShowWindow(SW_HIDE);
 				GetDlgItem(IDC_BUTTON_Leave2)->ShowWindow(SW_SHOW);
 
 			}
+
 			UpdateData(FALSE);
 			break;
 		}
 		case 6: {
-			contentPrivateChat += "The conversation with your partner ended\r\n";
+			contentPrivateChat = _T("The conversation with your partner ended\r\n");
 			GetDlgItem(IDC_BUTTON_Invite)->ShowWindow(SW_SHOW);
-			GetDlgItem(IDC_EDIT2)->SetWindowTextW(L"");
+			GetDlgItem(IDC_EDIT2)->SetWindowTextW(_T(""));
 
 			GetDlgItem(IDC_EDIT2)->ShowWindow(SW_SHOW);
 			GetDlgItem(IDC_BUTTON_Leave2)->ShowWindow(SW_HIDE);
-
-			contentPrivateChat = "";
-			//UpdateData(FALSE);
+			CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
+			listbox2->AddString(contentPrivateChat);
+			UpdateData(FALSE);
 			break;
 		}
 		case 9: {
-			contentPrivateChat += strResult[1];
-			contentPrivateChat += "\r\n";
+			contentPrivateChat = strResult[1];
+			contentPrivateChat += _T("\r\n");
+			CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
+			listbox2->AddString(contentPrivateChat);
 			UpdateData(FALSE);
 
 			break;
 		}
 		case 10:
 		{
-			contentPrivateChat += strResult[1];
-			contentPrivateChat += "\r\n";
+			contentPrivateChat = strResult[1];
+			contentPrivateChat += _T("\r\n");
+			CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
+			listbox2->AddString(contentPrivateChat);
 			UpdateData(FALSE);
 			break;
 		}
@@ -421,9 +435,9 @@ void CClientDlg::OnBnClickedButtonlogin()
 		return;
 	}
 
-	Command = "1\r\n";
+	Command = _T("1\r\n");
 	Command += user + '/' + password;
-	Command += "\r\n";
+	Command += _T("\r\n");
 
 	mSend(Command);
 
@@ -485,9 +499,9 @@ void CClientDlg::OnBnClickedButtonsignup()
 	}
 
 
-	Command = "2\r\n";
+	Command = _T("2\r\n");
 	Command += user + '/' + password;
-	Command += "\r\n";
+	Command += _T("\r\n");
 
 	mSend(Command);
 
@@ -502,16 +516,18 @@ void CClientDlg::OnBnClickedButtonGroupsend()
 {
 	CString msgTemp;
 	GetDlgItemText(IDC_EDIT1, msgTemp);
-	Command = "4\r\n";
+	//if (!msgTemp.GetLength()) return;
+	Command = _T("4\r\n");
 	Command += msgTemp;
-	Command += "\r\n";
+	Command += _T("\r\n");
 	mSend(Command);
-	contentGroupChat += "You: ";
+	contentGroupChat = _T("You: ");
 	contentGroupChat += msgTemp;
-	contentGroupChat += "\r\n";
-	SetDlgItemText(IDC_EDIT1, L"");
+	contentGroupChat += _T("\r\n");
+	CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentGroupChat2);
+	listbox2->AddString(contentGroupChat);
+	SetDlgItemText(IDC_EDIT1, _T(""));
 	UpdateData(FALSE);
-
 }
 
 
@@ -520,14 +536,18 @@ void CClientDlg::OnBnClickedButtonPrivatesend()
 
 	CString msgTemp;
 	GetDlgItemText(IDC_editMessage, msgTemp);
-	Command = "9\r\n";
+	if (!msgTemp.GetLength()) return;
+
+	Command = _T("9\r\n");
 	Command += msgTemp;
-	Command += "\r\n";
+	Command += _T("\r\n");
 	mSend(Command);
-	contentPrivateChat += "You: ";
+	contentPrivateChat = _T("You: ");
 	contentPrivateChat += msgTemp;
-	contentPrivateChat += "\r\n";
-	SetDlgItemText(IDC_editMessage, L"");
+	contentPrivateChat += _T("\r\n");
+	CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
+	listbox2->AddString(contentPrivateChat);
+	SetDlgItemText(IDC_editMessage, _T(""));
 	UpdateData(FALSE);
 }
 
@@ -548,13 +568,15 @@ void CClientDlg::OnBnClickedButtonAttach()
 		CString PathName = dlgFile.GetPathName();
 		CString fileName = dlgFile.GetFileName();
 		// Do something with 'PathName'
-		Command = "10\r\n";
+		Command = _T("10\r\n");
 		Command += PathName;
-		Command += "\r\n";
+		Command += _T("\r\n");
 		mSend(Command);
-		contentPrivateChat += "You sent a file: ";
+		contentPrivateChat = _T("You sent a file: ");
 		contentPrivateChat += fileName;
-		contentPrivateChat += "\r\n";
+		contentPrivateChat += _T("\r\n");
+		CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
+		listbox2->AddString(contentPrivateChat);
 		SetDlgItemText(IDC_editMessage, L"");
 		UpdateData(FALSE);
 	}
@@ -571,9 +593,10 @@ void CClientDlg::OnBnClickedButtonInvite()
 	// TODO: Add your control notification handler code here
 	CString userPartner;
 	GetDlgItemText(IDC_EDIT2, userPartner);
-	Command = "5\r\n";
+	if (!userPartner.GetLength()) return;
+	Command = _T("5\r\n");
 	Command += userPartner;
-	Command += "\r\n";
+	Command += _T("\r\n");
 	mSend(Command);
 	UpdateData(FALSE);
 }
@@ -581,21 +604,28 @@ void CClientDlg::OnBnClickedButtonInvite()
 
 void CClientDlg::OnBnClickedButtonLeave2()
 {
-	Command = "6\r\n0\r\n";
+	Command = _T("6\r\n0\r\n");
 	mSend(Command);
 }
 
 
 void CClientDlg::OnBnClickedButtonLogout()
 {
-	Command = "3\r\n1\r\n";
+	Command = _T("3\r\n1\r\n");
 	mSend(Command);
 	HideAllComponent();
-	SetDlgItemText(IDC_EDIT1, L"");
-	SetDlgItemText(IDC_editMessage, L"");
-	SetDlgItemText(IDC_EDIT2, L"");
-	contentGroupChat = "";
-	contentPrivateChat = "";
+	SetDlgItemText(IDC_EDIT1, _T(""));
+	SetDlgItemText(IDC_editMessage, _T(""));
+	SetDlgItemText(IDC_EDIT2, _T(""));
+	SetDlgItemText(IDC_EDIT2, _T(""));
+	SetDlgItemText(IDC_STATICNoti, _T(""));
+	SetDlgItemText(IDC_STATICCli, _T(""));
+	notifi = _T("");
+
+	CListBox * listbox2 = (CListBox *)GetDlgItem(IDC_ContentPrivateChat2);
+	listbox2->ResetContent();
+	CListBox * listbox1 = (CListBox *)GetDlgItem(IDC_ContentGroupChat2);
+	listbox1->ResetContent();
 	UpdateData(FALSE);
 }
 // "9\r\n\Msg\r\n
